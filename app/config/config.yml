@@ -40,7 +40,7 @@ twig:
 # Doctrine Configuration
 doctrine:
     dbal:
-        driver:   pdo_mysql
+        driver:   pdo_pgsql
         host:     "%database_host%"
         port:     "%database_port%"
         dbname:   "%database_name%"
@@ -66,3 +66,15 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+authbucket_oauth2:
+    driver:                 orm
+    user_provider:          security.user.provider.concrete.default
+    model:
+        access_token:       AppBundle\Entity\AccessToken
+        authorize:          AppBundle\Entity\Authorize
+        client:             AppBundle\Entity\Client
+        code:               AppBundle\Entity\Code
+        refresh_token:      AppBundle\Entity\RefreshToken
+        scope:              AppBundle\Entity\Scope
+        user:               AppBundle\Entity\User
