@@ -25,8 +25,8 @@ class DefaultController extends Controller
 
         try {
             //$conn->getSchemaManager()->dropDatabase($name);
-            //$conn->getSchemaManager()->createDatabase($name);
-            $conn->getSchemaManager()->dropAndCreateDatabase($name);
+            $conn->getSchemaManager()->createDatabase($name);
+            //$conn->getSchemaManager()->dropAndCreateDatabase($name);
             $conn->close();
         } catch (\Exception $e) {
             throw $e;
