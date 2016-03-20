@@ -13,8 +13,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/install")
+     * /@/Route("/install")
      */
+	/*
     public function indexAction()
     {
         $conn = $this->get('database_connection');
@@ -24,9 +25,8 @@ class DefaultController extends Controller
         $name = isset($params['path']) ? $params['path'] : (isset($params['dbname']) ? $params['dbname'] : false);
 
         try {
-            //$conn->getSchemaManager()->dropDatabase($name);
+            $conn->getSchemaManager()->dropDatabase($name);
             $conn->getSchemaManager()->createDatabase($name);
-            //$conn->getSchemaManager()->dropAndCreateDatabase($name);
             $conn->close();
         } catch (\Exception $e) {
             throw $e;
@@ -51,4 +51,5 @@ class DefaultController extends Controller
 
         return $this->redirect($this->get('router')->generate('homepage'));
     }
+	*/
 }
