@@ -1,0 +1,9 @@
+parameters: ~
+
+services:
+    app.user_registration_listener:
+        class: AppBundle\EventListener\UserRegistrationListener
+        tags:
+            - { name: kernel.event_listener, event: app.user_registration, method: onComplete, priority: -1 }
+        arguments:
+            - "@logger"
