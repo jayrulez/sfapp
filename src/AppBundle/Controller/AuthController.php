@@ -7,9 +7,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Client;
 use AppBundle\Entity\EmailAddress;
 use AppBundle\Entity\MobileNumber;
 use AppBundle\Event\UserRegistrationEvent;
+use AppBundle\Event\UserLoginEvent;
 
 class AuthController extends Controller
 {
@@ -66,7 +68,8 @@ class AuthController extends Controller
             $mobileNumber->setUser($user);
         }else{
             return new JsonResponse([
-                'error' => 'Mobile Number or Email Address is required.'
+                'error'=>'validation_error',
+                'error_description' => 'Mobile Number or Email Address is required.'
             ]);
         }
 
@@ -75,7 +78,8 @@ class AuthController extends Controller
     	if(count($errors) > 0)
     	{
         	return new JsonResponse([
-        		'error' => $errors[0]->getMessage()
+                'error'=>'validation_error',
+        		'error_description' => $errors[0]->getMessage()
         	]);
     	}
 
@@ -113,7 +117,8 @@ class AuthController extends Controller
             $this->get('logger')->error($e->getMessage());
 
             return new JsonResponse([
-                'error' => $e->getMessage()
+                'error'=>'internal_server_error',
+                'error_description' => $e->getMessage()
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -124,6 +129,72 @@ class AuthController extends Controller
      */
     public function loginAction(Request $request)
     {
-        return new JsonResponse([]);
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $username     = $request->request->get('username');
+        $password     = $request->request->get('password');
+        $clientId     = $request->request->get('client_id');
+        $clientSecret = $request->request->get('client_secret');
+        $grantType    = $request->request->get('grant_type');
+        try
+        {
+            if(strpos($username, '@') !== false)
+            {
+                $username = trim(strtolower($username));
+
+                $emailAddress = $em->getRepository('AppBundle:EmailAddress')->find($username);
+
+                if($emailAddress != null)
+                {
+                    $username = $emailAddress->getUser()->getUsername();
+                }
+            }else{
+                $mobileNumber = $em->getRepository('AppBundle:MobileNumber')->findOneBy([
+                    'number' => $username
+                ]);
+
+                if($mobileNumber != null)
+                {
+                    $username = $mobileNumber->getUser()->getUsername();
+                }
+            }
+
+            $parameters = [
+                'username'      => $username,
+                'password'      => $password,
+                'client_id'     => $clientId,
+                'client_secret' => $clientSecret,
+                'grant_type'    => $grantType,
+            ];
+
+            $server   = [];
+            $client   = new Client($this->get('kernel'));
+            $crawler  = $client->request('POST', '/api/oauth2/token', $parameters, [], $server);
+            $response = $client->getResponse();
+            $data     = json_decode($response->getContent(), true);
+
+            if(isset($data['token']))
+            {
+                try
+                {
+                    $event           = new UserLoginEvent($request);
+                    $eventDispatcher = $this->get('event_dispatcher');
+                    $eventDispatcher->dispatch(UserLoginEvent::USER_LOGIN, $event);
+                }catch(\Exception $e)
+                {
+                    $this->get('logger')->error($e->getMessage());
+                }
+            }
+
+            return new JsonResponse($data, JsonResponse::HTTP_OK, [], true);
+        }catch(\Exception $e)
+        {
+            $this->get('logger')->error($e->getMessage());
+
+            return new JsonResponse([
+                'error'=>'internal_server_error',
+                'error_description' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
