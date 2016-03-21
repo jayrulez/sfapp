@@ -7,3 +7,10 @@ services:
             - { name: kernel.event_listener, event: app.user_registration, method: onComplete, priority: -1 }
         arguments:
             - "@logger"
+
+    app.user_login_listener:
+        class: AppBundle\EventListener\UserLoginListener
+        tags:
+            - { name: kernel.event_listener, event: app.user_login, method: onComplete, priority: -1 }
+        arguments:
+            - "@logger"

@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use AppBundle\Entity\EmailAddress;
 use AppBundle\Entity\MobileNumber;
 use AppBundle\Event\UserRegistrationEvent;
@@ -167,11 +168,10 @@ class AuthController extends Controller
                 'grant_type'    => $grantType,
             ];
 
-            $server   = [];
-            $client   = new Client($this->get('kernel'));
-            $crawler  = $client->request('POST', '/api/oauth2/token', $parameters, [], $server);
-            $response = $client->getResponse();
-            $data     = json_decode($response->getContent(), true);
+            $subRequest = Request::create('/api/oauth2/token', 'POST', $parameters);
+            $httpKernel = $this->get('http_kernel');
+            $response   = $httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+            $data       = json_decode($response->getContent(), true);
 
             if(isset($data['token']))
             {
