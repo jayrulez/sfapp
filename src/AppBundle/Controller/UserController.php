@@ -10,10 +10,54 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class UserController extends Controller
 {
     /**
-     * @Route("/api/users", name="api_users")
+     * @Route("/api/users/verify_email_address", name="api_users_verify_email_address")
      */
-    public function indexAction(Request $request)
+    public function verifyEmailAddressAction(Request $request)
     {
-    	return new JsonResponse([]);
+    	$em      = $this->getDoctrine()->getManager();
+    	$code    = $request->request->get('code');
+    	$address = trim(strtolower($request->request->get('email_address')));
+
+    	$verificationCodeHelper = $this->get('verification_code_helper');
+
+    	try
+    	{
+    		$emailAddress = $em->getRepository('AppBundle:EmailAddress')->find($address);
+
+    		if($emailAddress == null || $emailAddress->getVerified())
+    		{
+	            return new JsonResponse([
+	                'error'=>'invalid_email_address',
+	                'error_description' => 'This email address cannot be verified.'
+	            ]);
+    		}
+
+    		$verificationCode = $verificationCodeHelper->find(VerificationCode::TYPE_EMAIL_ADDRESS, $emailAddress->getAddress());
+
+    		if($verificationCode == null || $verificationCode->isExpired() || $code != $verificationCode->getCode())
+    		{
+	            return new JsonResponse([
+	                'error'=>'invalid_verification_code',
+	                'error_description' => 'This verification code is invalid.'
+	            ]);
+    		}
+
+    		$emailAddress->setVerified(true)
+    			->setUpdatedAt(new \DateTime('now'));
+
+    		$em->persist($emailAddress);
+    		$em->remove($verificationCode);
+    		$em->flush();
+
+    		return new JsonResponse([], JsonResponse::HTTP_OK);
+    	}catch(\Exception $e)
+        {
+            $this->get('logger')->error($e->getMessage());
+
+            return new JsonResponse([
+                'error'=>'internal_server_error',
+                'error_description' => $e->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
