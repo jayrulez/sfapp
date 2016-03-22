@@ -13,6 +13,7 @@ use AppBundle\Entity\EmailAddress;
 use AppBundle\Entity\MobileNumber;
 use AppBundle\Event\UserRegistrationEvent;
 use AppBundle\Event\UserLoginEvent;
+use AppBundle\Common\ApiResponse;
 
 class AuthController extends Controller
 {
