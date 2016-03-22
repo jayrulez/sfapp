@@ -17,6 +17,21 @@ services:
         arguments:
             - "@doctrine.orm.entity_manager"
 
+    user_helper:
+        class: AppBundle\Helper\UserHelper
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
+    mobile_number_helper:
+        class: AppBundle\Helper\MobileNumberHelper
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
+    email_address_helper:
+        class: AppBundle\Helper\EmailAddressHelper
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
     app.user_registration_listener:
         class: AppBundle\EventListener\UserRegistrationListener
         tags:

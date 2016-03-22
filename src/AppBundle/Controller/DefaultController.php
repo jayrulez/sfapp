@@ -9,13 +9,11 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="default")
+     * @Route("/api/public/version", name="api_version")
      */
-    public function indexAction(Request $request)
+    public function apiVersionAction(Request $request)
     {
-        // replace this example code with whatever you need
-        return $this->render('app/default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-        ]);
+        return new JsonResponse([]);
     }
 }

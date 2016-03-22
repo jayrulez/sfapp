@@ -25,9 +25,9 @@ security:
             pattern:                ^/api/oauth2/debug$
             oauth2_resource:        ~
 
-        api_auth:
-            pattern:                ^/api/auth
-            oauth2_token:        ~
+        api_public:
+            pattern:                ^/api/public
+            oauth2_token:           ~
 
         api_resource:
             pattern:                ^/api/resource

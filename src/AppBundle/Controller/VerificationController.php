@@ -5,22 +5,25 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Entity\VerificationCode;
 use AppBundle\Common\ApiResponse;
-use AppBundle\Common\ApiResponseData;
+use AppBundle\Common\Result;
+use AppBundle\Common\ErrorCode;
 
-class PublicController extends Controller
+/**
+ * @Route("/api/public")
+ */
+class VerificationController extends Controller
 {
     /**
-     * @Route("/api/public/verify_email_address", name="api_public_verify_email_address")
+     * @Route("/verify_email_address", name="verify_email_address")
      */
     public function verifyEmailAddressAction(Request $request)
     {
+        $result  = new Result();
     	$em      = $this->getDoctrine()->getManager();
     	$code    = $request->request->get('code');
     	$address = trim(strtolower($request->request->get('email_address')));
-    	$responseData = new ApiResponseData();
 
     	$verificationCodeHelper = $this->get('verification_code_helper');
 
@@ -30,22 +33,18 @@ class PublicController extends Controller
 
     		if($emailAddress == null || $emailAddress->getVerified())
     		{
-    			$responseData->setError();
+    			$result->setError('This email address cannot be verified', ErrorCode::INVALID_EMAIL_ADDRESS);
     			
-	            return new ApiResponse([
-	                'error'=>'invalid_email_address',
-	                'error_description' => 'This email address cannot be verified.'
-	            ]);
+	            return new ApiResponse($result);
     		}
 
     		$verificationCode = $verificationCodeHelper->find(VerificationCode::TYPE_EMAIL_ADDRESS, $emailAddress->getAddress());
 
     		if($verificationCode == null || $verificationCode->isExpired() || $code != $verificationCode->getCode())
     		{
-	            return new JsonResponse([
-	                'error'=>'invalid_verification_code',
-	                'error_description' => 'This verification code is invalid.'
-	            ]);
+                $result->setError('This verification code is invalid', ErrorCode::INVALID_VERIFICATION_CODE);
+                
+                return new ApiResponse($result);
     		}
 
     		$emailAddress->setVerified(true)
@@ -55,15 +54,17 @@ class PublicController extends Controller
     		$em->remove($verificationCode);
     		$em->flush();
 
-    		return new JsonResponse([], JsonResponse::HTTP_OK);
+            $result->setData($emailAddress);
+
+    		return new ApiResponse($result);
     	}catch(\Exception $e)
         {
             $this->get('logger')->error($e->getMessage());
 
-            return new JsonResponse([
-                'error'=>'internal_server_error',
-                'error_description' => $e->getMessage()
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            $result->setStatusCode(ApiResponse::HTTP_INTERNAL_SERVER_ERROR)
+                ->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
+
+            return new ApiResponse($result);
         }
     }
 }

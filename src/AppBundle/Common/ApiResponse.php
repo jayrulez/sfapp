@@ -7,10 +7,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class ApiResponse extends JsonResponse
 {
     /**
-     * @param ApiResponseData $data    The response data
+     * @param Result $data    The response data
      */
-    public function __construct(ApiResponseData $data, $headers = [])
+    public function __construct(Result $result, $headers = [])
     {
-        parent::__construct($data->toJson(), $data->getStatusCode(), $headers, true);
+    	if(!isset($headers['Content-Type']))
+    	{
+    		$headers['Content-Type'] = 'application/json';
+    	}
+
+        parent::__construct($result->toJson(), $result->getStatusCode(), $headers, true);
     }
 }

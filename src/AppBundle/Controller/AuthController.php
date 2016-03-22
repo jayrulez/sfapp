@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use AppBundle\Entity\EmailAddress;
@@ -14,19 +13,23 @@ use AppBundle\Entity\MobileNumber;
 use AppBundle\Event\UserRegistrationEvent;
 use AppBundle\Event\UserLoginEvent;
 use AppBundle\Common\ApiResponse;
+use AppBundle\Common\Result;
+use AppBundle\Common\ErrorCode;
 
+/**
+ * @Route("/api/public")
+ */
 class AuthController extends Controller
 {
     /**
-     * @Route("/api/auth/register", name="api_auth_register")
+     * @Route("/register", name="register")
      * @Method({"POST"})
      */
     public function registerAction(Request $request)
     {
-    	$em = $this->getDoctrine()->getManager();
-
-    	$user = $em->getRepository('AppBundle:User')->createUser();
-
+        $result    = new Result();
+    	$em        = $this->getDoctrine()->getManager();
+    	$user      = $em->getRepository('AppBundle:User')->createUser();
         $firstName = trim(ucwords(strtolower($request->request->get('first_name'))));
         $lastName  = trim(ucwords(strtolower($request->request->get('last_name'))));
         $password  = $request->request->get('password');
@@ -69,20 +72,18 @@ class AuthController extends Controller
 
             $mobileNumber->setUser($user);
         }else{
-            return new JsonResponse([
-                'error'=>'validation_error',
-                'error_description' => 'Mobile Number or Email Address is required.'
-            ]);
+            $result->setError('Mobile number or email address is required.', ErrorCode::VALIDATION_ERROR);
+                
+            return new ApiResponse($result);
         }
 
     	$errors = $this->get('validator')->validate($user);
 
     	if(count($errors) > 0)
     	{
-        	return new JsonResponse([
-                'error'=>'validation_error',
-        		'error_description' => $errors[0]->getMessage()
-        	]);
+            $result->setError($errors[0]->getMessage(), ErrorCode::VALIDATION_ERROR);
+                
+            return new ApiResponse($result);
     	}
 
         $em->getConnection()->beginTransaction();
@@ -109,35 +110,36 @@ class AuthController extends Controller
                 $this->get('logger')->error($e->getMessage());
             }
 
-            return new JsonResponse([
-                'username' => $user->getUsername()
-            ]);
+            $result->setData($user, ["password"]);
+
+            return new ApiResponse($result);
         }catch(\Exception $e)
         {
             $em->getConnection()->rollBack();
 
             $this->get('logger')->error($e->getMessage());
 
-            return new JsonResponse([
-                'error'=>'internal_server_error',
-                'error_description' => $e->getMessage()
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            $result->setStatusCode(ApiResponse::HTTP_INTERNAL_SERVER_ERROR)
+                ->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
+
+            return new ApiResponse($result);
         }
     }
 
     /**
-     * @Route("/api/auth/login", name="api_auth_login")
+     * @Route("/login", name="login")
      * @Method({"POST"})
      */
     public function loginAction(Request $request)
     {
-        $em = $this->getDoctrine()->getEntityManager();
-
+        $result       = new Result();
+        $em           = $this->getDoctrine()->getEntityManager();
         $username     = $request->request->get('username');
         $password     = $request->request->get('password');
         $clientId     = $request->request->get('client_id');
         $clientSecret = $request->request->get('client_secret');
         $grantType    = $request->request->get('grant_type');
+
         try
         {
             if(strpos($username, '@') !== false)
@@ -174,7 +176,7 @@ class AuthController extends Controller
             $response   = $httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
             $tokenData  = json_decode($response->getContent(), true);
 
-            if(isset($tokenData['token']))
+            if(isset($tokenData['access_token']))
             {
                 try
                 {
@@ -185,17 +187,26 @@ class AuthController extends Controller
                 {
                     $this->get('logger')->error($e->getMessage());
                 }
+
+                $result->setData($tokenData);
+            
+                return new ApiResponse($result);
+            }else{
+                $result->setError('Invalid credentials provided.', ErrorCode::INVALID_CREDENTIALS);
+
+                return new ApiResponse($result);
             }
 
-            return new JsonResponse($tokenData, JsonResponse::HTTP_OK, [], true);
         }catch(\Exception $e)
         {
             $this->get('logger')->error($e->getMessage());
 
-            return new JsonResponse([
-                'error'=>'internal_server_error',
-                'error_description' => $e->getMessage()
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            $this->get('logger')->error($e->getMessage());
+
+            $result->setStatusCode(ApiResponse::HTTP_INTERNAL_SERVER_ERROR)
+                ->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
+
+            return new ApiResponse($result);
         }
     }
 }
