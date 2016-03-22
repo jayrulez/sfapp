@@ -23,7 +23,7 @@ class EmailService
 		$this->message->setTo($emailAddress)
 			->setSubject($subject)
 			->setBody($body)
-			->setContentType($isHtml ? "text/html": "text");
+			->setContentType($isHtml ? "text/html": "text/plain");
 
 		$this->mailer->send($this->message);
 	}
