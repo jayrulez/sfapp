@@ -171,13 +171,13 @@ class AuthController extends Controller
             $subRequest = Request::create('/api/oauth2/token', 'POST', $parameters);
             $httpKernel = $this->get('http_kernel');
             $response   = $httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-            $data       = json_decode($response->getContent(), true);
+            $tokenData  = json_decode($response->getContent(), true);
 
-            if(isset($data['token']))
+            if(isset($tokenData['token']))
             {
                 try
                 {
-                    $event           = new UserLoginEvent($request);
+                    $event           = new UserLoginEvent($tokenData, $request);
                     $eventDispatcher = $this->get('event_dispatcher');
                     $eventDispatcher->dispatch(UserLoginEvent::USER_LOGIN, $event);
                 }catch(\Exception $e)
@@ -186,7 +186,7 @@ class AuthController extends Controller
                 }
             }
 
-            return new JsonResponse($data, JsonResponse::HTTP_OK, [], true);
+            return new JsonResponse($tokenData, JsonResponse::HTTP_OK, [], true);
         }catch(\Exception $e)
         {
             $this->get('logger')->error($e->getMessage());

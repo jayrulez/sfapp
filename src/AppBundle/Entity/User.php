@@ -190,6 +190,11 @@ class User implements ModelInterface, UserInterface
      */
     protected $devices;
 
+    public function getFullName()
+    {
+        return $this->firstName . ' ' . $this->lastName;
+    }
+
     /**
      * Get id.
      *

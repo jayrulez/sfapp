@@ -2,10 +2,15 @@
 
 namespace AppBundle\Service;
 
-class MessagingService
+class SMSService
 {
 	public function __construct()
 	{
 		
+	}
+
+	public function sendMessage($number, $message)
+	{
+
 	}
 }

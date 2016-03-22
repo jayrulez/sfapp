@@ -1,0 +1,14 @@
+{% extends 'email.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <div id="wrapper">
+      	<p>Email verification code: {{ verificationCode.code }}</p>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+</style>
+{% endblock %}

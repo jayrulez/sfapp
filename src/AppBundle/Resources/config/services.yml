@@ -1,16 +1,32 @@
 parameters: ~
 
 services:
+    email_service:
+        class: AppBundle\Service\EmailService
+        arguments:
+            - "@mailer"
+            - "%mailer_email%"
+            - "%mailer_name%"
+
+    sms_service:
+        class: AppBundle\Service\SMSService
+        arguments: ~
+
+    verification_code_helper:
+        class: AppBundle\Helper\VerificationCodeHelper
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
     app.user_registration_listener:
         class: AppBundle\EventListener\UserRegistrationListener
         tags:
             - { name: kernel.event_listener, event: app.user_registration, method: onComplete, priority: -1 }
         arguments:
-            - "@logger"
+            - "@service_container"
 
     app.user_login_listener:
         class: AppBundle\EventListener\UserLoginListener
         tags:
             - { name: kernel.event_listener, event: app.user_login, method: onComplete, priority: -1 }
         arguments:
-            - "@logger"
+            - "@service_container"

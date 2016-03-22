@@ -2,26 +2,30 @@
 
 namespace AppBundle\EventListener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use AppBundle\Event\UserLoginEvent;
 
 class UserLoginListener
 {
-	protected $logger;
+	protected $container;
 
-	public function __construct($logger)
+	public function __construct(ContainerInterface $container)
 	{
-		$this->logger = $logger;
+		$this->container = $container;
 	}
 
 	public function onComplete(UserLoginEvent $event)
 	{
+		$logger = $this->container->get('logger');
+
 		try
 		{
+			$token   = $event->getToken();
 			$request = $event->getRequest();
 
 		}catch(\Exception $e)
 		{
-			$this->logger->error($e->getMessage());
+			$logger->error($e->getMessage());
 		}
 	}
 }

@@ -16,6 +16,29 @@ class VerificationCode
 	const TYPE_MOBILE_NUMBER = 'mobile_number';	
 	const TYPE_EMAIL_ADDRESS = 'email_address';
 
+    public static function generateCode($type)
+    {
+        $code = '';
+
+        switch($type)
+        {
+            case self::TYPE_MOBILE_NUMBER:
+            case self::TYPE_EMAIL_ADDRESS:
+                $code = mt_rand(100000, 999999);
+            break;
+
+            default:
+                $code = uniqid();
+        }
+
+        return $code;
+    }
+
+    public function isExpired()
+    {
+        return $this->expiresAt > new \DateTime('now');
+    }
+
     /**
      * @var string
      *
