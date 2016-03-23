@@ -8,16 +8,17 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use AppBundle\Normalizer\DateTimeNormalizer;
 
 class Result
 {
 	private $_successful;
 	private $_error             = null;
 	private $_data              = null;
-	private $_statusCode        = null;
 	private $_ignoredAttributes = [];
 
-	public function __construct($data = null, $statusCode = Response::HTTP_OK)
+	public function __construct($data = null)
 	{
 		if($data instanceof Error)
 		{
@@ -25,8 +26,6 @@ class Result
 		}else{
 			$this->_data = $data;
 		}
-
-		$this->_statusCode = $statusCode;
 	}
 
 	public function setData($data, array $ignoredAttributes = [])
@@ -50,23 +49,19 @@ class Result
 		return $this->_error == null ? true : false;
 	}
 
-	public function getStatusCode()
-	{
-		return $this->_statusCode;
-	}
-
 	public function toJson()
 	{
-		$encoders   = [new JsonEncoder(new JsonEncode(JSON_UNESCAPED_SLASHES), new JsonDecode(false))];
-		$normalizer = new ObjectNormalizer();
+		$encoders           = [new JsonEncoder(new JsonEncode(JSON_UNESCAPED_SLASHES), new JsonDecode(false))];
+		$objectNormalizer   = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
+		$dateTimeNormalizer = new DateTimeNormalizer();
 
-		$normalizer->setCircularReferenceHandler(function($object) {
+		$objectNormalizer->setCircularReferenceHandler(function($object) {
 			return "";
 		});
 
-		$normalizer->setIgnoredAttributes($this->_ignoredAttributes);
+		$objectNormalizer->setIgnoredAttributes($this->_ignoredAttributes);
 
-		$normalizers = [$normalizer];
+		$normalizers = [$dateTimeNormalizer, $objectNormalizer];
 
 		$serializer = new Serializer($normalizers, $encoders);
 

@@ -12,4 +12,21 @@ class EmailAddressHelper
 	{
 		$this->em = $em;
 	}
+
+	public function createEmailAddress()
+	{
+		return new EmailAddress();
+	}
+
+	public function normalizeAddress($address)
+	{
+		return trim(strtolower($address));
+	}
+
+	public function findByAddress($address)
+	{
+		$address = $this->normalizeAddress($address);
+
+		return $this->em->getRepository('AppBundle:EmailAddress')->find($address);
+	}
 }

@@ -21,6 +21,9 @@ services:
         class: AppBundle\Helper\UserHelper
         arguments:
             - "@doctrine.orm.entity_manager"
+            - "@security.token_storage"
+            - "@mobile_number_helper"
+            - "@email_address_helper"
 
     mobile_number_helper:
         class: AppBundle\Helper\MobileNumberHelper
@@ -45,3 +48,8 @@ services:
             - { name: kernel.event_listener, event: app.user_login, method: onComplete, priority: -1 }
         arguments:
             - "@service_container"
+
+    date_time_normalizer:
+        class: AppBundle\Normalizer\DateTimeNormalizer
+        tags:
+            - { name: serializer.normalizer }

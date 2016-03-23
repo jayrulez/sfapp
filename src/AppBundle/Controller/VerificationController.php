@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\VerificationCode;
 use AppBundle\Common\ApiResponse;
@@ -17,6 +18,7 @@ class VerificationController extends Controller
 {
     /**
      * @Route("/verify_email_address", name="verify_email_address")
+     * @Method({"POST"})
      */
     public function verifyEmailAddressAction(Request $request)
     {
@@ -61,10 +63,9 @@ class VerificationController extends Controller
         {
             $this->get('logger')->error($e->getMessage());
 
-            $result->setStatusCode(ApiResponse::HTTP_INTERNAL_SERVER_ERROR)
-                ->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
+            $result->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
 
-            return new ApiResponse($result);
+            return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use AppBundle\Entity\EmailAddress;
 use AppBundle\Entity\MobileNumber;
@@ -27,13 +26,17 @@ class AuthController extends Controller
      */
     public function registerAction(Request $request)
     {
-        $result    = new Result();
-    	$em        = $this->getDoctrine()->getManager();
-    	$user      = $em->getRepository('AppBundle:User')->createUser();
-        $firstName = trim(ucwords(strtolower($request->request->get('first_name'))));
-        $lastName  = trim(ucwords(strtolower($request->request->get('last_name'))));
-        $password  = $request->request->get('password');
-    	$username  = substr(strtolower($firstName), 0, 3) . substr(strtolower($lastName), 0, 3) . uniqid();
+        $result     = new Result();
+
+    	$em         = $this->getDoctrine()->getManager();
+        $userHelper = $this->get('user_helper');
+
+        $firstName  = $userHelper->normalizeFirstName($request->request->get('first_name'));
+        $lastName   = $userHelper->normalizeLastName($request->request->get('last_name'));
+        $password   = $request->request->get('password');
+    	$username   = $userHelper->generateUsername($firstName, $lastName);
+
+        $user       = $userHelper->createUser();
 
     	$user->setUsername($username)
             ->setFirstName($firstName)
@@ -44,9 +47,11 @@ class AuthController extends Controller
 
         if(($address = $request->request->get('email_address', null)) != null)
         {
-            $address = trim(strtolower($address));
+            $emailAddressHelper = $this->get('email_address_helper');
 
-            $emailAddress = new EmailAddress();
+            $address = $emailAddressHelper->normalizeAddress($address);
+
+            $emailAddress = $emailAddressHelper->createEmailAddress();
             $emailAddress->setAddress($address)
                 ->setVerified(false)
                 ->setCreatedAt(new \DateTime('now'));
@@ -57,10 +62,11 @@ class AuthController extends Controller
                 $emailAddress->setUser($user);
         }else if(($countryCode = $request->request->get('country_code', null)) != null && ($number = $request->request->get('mobile_number', null)) != null)
         {
-            $countryCode = trim($countryCode);
-            $number      = trim($number);
+            $mobileNumberhelper = $this->get('mobile_number_helper');
 
-            $mobileNumber = new MobileNumber();
+            $countryCode  = $mobileNumberhelper->normalizeCountryCode($countryCode);
+            $number       = $mobileNumberhelper->normalizeNumber($number);
+            $mobileNumber = $mobileNumberhelper->createMobileNumber();
 
             $mobileNumber->setCountryCode($countryCode)
                 ->setNumber($number)
@@ -119,10 +125,9 @@ class AuthController extends Controller
 
             $this->get('logger')->error($e->getMessage());
 
-            $result->setStatusCode(ApiResponse::HTTP_INTERNAL_SERVER_ERROR)
-                ->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
+            $result->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
 
-            return new ApiResponse($result);
+            return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -142,20 +147,20 @@ class AuthController extends Controller
 
         try
         {
+            $userHelper         = $this->get('user_helper');
+            $emailAddressHelper = $this->get('email_address_helper');
+            $mobileNumberhelper = $this->get('mobile_number_helper');
+
             if(strpos($username, '@') !== false)
             {
-                $username = trim(strtolower($username));
-
-                $emailAddress = $em->getRepository('AppBundle:EmailAddress')->find($username);
+                $emailAddress = $emailAddressHelper->findByAddress($username);
 
                 if($emailAddress != null)
                 {
                     $username = $emailAddress->getUser()->getUsername();
                 }
             }else{
-                $mobileNumber = $em->getRepository('AppBundle:MobileNumber')->findOneBy([
-                    'number' => $username
-                ]);
+                $mobileNumber = $mobileNumberhelper->findByNumber($username);
 
                 if($mobileNumber != null)
                 {
@@ -201,12 +206,9 @@ class AuthController extends Controller
         {
             $this->get('logger')->error($e->getMessage());
 
-            $this->get('logger')->error($e->getMessage());
+            $result->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
 
-            $result->setStatusCode(ApiResponse::HTTP_INTERNAL_SERVER_ERROR)
-                ->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
-
-            return new ApiResponse($result);
+            return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

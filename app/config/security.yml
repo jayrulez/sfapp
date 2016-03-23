@@ -31,7 +31,8 @@ security:
 
         api_resource:
             pattern:                ^/api/resource
-            oauth2_resource:        ~
+            oauth2_resource:       
+                resource_type:      model
 
         api_resource_model:
             pattern:                ^/api/resource/model$
