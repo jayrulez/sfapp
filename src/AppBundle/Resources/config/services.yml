@@ -49,6 +49,13 @@ services:
         arguments:
             - "@service_container"
 
+    app.username_change_listener:
+        class: AppBundle\EventListener\UsernameChangeListener
+        tags:
+            - { name: kernel.event_listener, event: app.username_change, method: onComplete, priority: -1 }
+        arguments:
+            - "@service_container"
+
     date_time_normalizer:
         class: AppBundle\Normalizer\DateTimeNormalizer
         tags:

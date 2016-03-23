@@ -10,6 +10,7 @@ use AppBundle\Common\ApiResponse;
 use AppBundle\Common\Result;
 use AppBundle\Common\ErrorCode;
 use AppBundle\Entity\User;
+use AppBundle\Event\UsernameChangeEvent;
 
 /**
  * @Route("/api/resource/users")
@@ -97,6 +98,7 @@ class UserController extends Controller
         try
         {
 
+	    	$oldUsername = $user->getUsername();
 	        $user->setUsername($username)
 	        	->setUpdatedAt(new \DateTime('now'));
 
@@ -105,6 +107,16 @@ class UserController extends Controller
 	        $em->flush();
 
 	        $result->setData($user, ['password', 'salt']);
+
+            try
+            {
+                $event           = new UsernameChangeEvent($user, $oldUsername);
+                $eventDispatcher = $this->get('event_dispatcher');
+                $eventDispatcher->dispatch(UsernameChangeEvent::USERNAME_CHANGE, $event);
+            }catch(\Exception $e)
+            {
+                $this->get('logger')->error($e->getMessage());
+            }
 
 	        return new ApiResponse($result);
 	    }catch(\Exception $e)
