@@ -25,8 +25,8 @@ class UserHelper
 	public function findByUsername($username)
 	{
 		$username = $this->normalizeUsername($username);
-		
-		return $this->em->getRepository('AppBundle:User')->loadUserByUsername($username);
+
+		return $this->em->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
 	}
 
 	public function findByIdOrUsername($identity)

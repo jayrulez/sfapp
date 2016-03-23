@@ -68,4 +68,59 @@ class VerificationController extends Controller
             return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @Route("/verify_mobile_number", name="verify_mobile_number")
+     * @Method({"POST"})
+     */
+    public function verifyMobileNumberAction(Request $request)
+    {
+        $result  = new Result();
+        $em      = $this->getDoctrine()->getManager();
+        $code    = $request->request->get('code');
+        $number  = trim(strtolower($request->request->get('mobile_number')));
+
+        $verificationCodeHelper = $this->get('verification_code_helper');
+
+        try
+        {
+            $mobileNumber = $em->getRepository('AppBundle:MobileNumber')->findOneBy([
+                'number' => $number
+            ]);
+
+            if($mobileNumber == null || $mobileNumber->getVerified())
+            {
+                $result->setError('This mobile number cannot be verified', ErrorCode::INVALID_MOBILE_NUMBER);
+                
+                return new ApiResponse($result);
+            }
+
+            $verificationCode = $verificationCodeHelper->find(VerificationCode::TYPE_MOBILE_NUMBER, $mobileNumber->getNumber());
+
+            if($verificationCode == null || $verificationCode->isExpired() || $code != $verificationCode->getCode())
+            {
+                $result->setError('This verification code is invalid', ErrorCode::INVALID_VERIFICATION_CODE);
+                
+                return new ApiResponse($result);
+            }
+
+            $mobileNumber->setVerified(true)
+                ->setUpdatedAt(new \DateTime('now'));
+
+            $em->persist($mobileNumber);
+            $em->remove($verificationCode);
+            $em->flush();
+
+            $result->setData($mobileNumber);
+
+            return new ApiResponse($result);
+        }catch(\Exception $e)
+        {
+            $this->get('logger')->error($e->getMessage());
+
+            $result->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
+
+            return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
