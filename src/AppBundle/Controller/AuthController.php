@@ -310,7 +310,7 @@ class AuthController extends Controller
             
                 return new ApiResponse($result);
             }else{
-                $result->setError('Invalid credentials provided.', ErrorCode::INVALID_PARAMETER);
+                $result->setError(isset($tokenData['error_description']) ? $tokenData['error_description'] : 'Invalid credentials provided.', ErrorCode::INVALID_PARAMETER);
 
                 return new ApiResponse($result);
             }
