@@ -26,9 +26,8 @@ class AuthController extends Controller
      * })
      * @Method({"POST"})
      */
-    public function registerAction(Request $request)
+    public function registerV1Action(Request $request)
     {
-        exit('v1');
         $result     = new Result();
 
     	$em         = $this->getDoctrine()->getManager();
@@ -141,7 +140,6 @@ class AuthController extends Controller
      */
     public function registerV2Action(Request $request)
     {
-        exit('v2');
         $result     = new Result();
 
         $em         = $this->getDoctrine()->getManager();
@@ -252,7 +250,6 @@ class AuthController extends Controller
      */
     public function loginAction(Request $request)
     {
-        exit('login');
         $result       = new Result();
         $em           = $this->getDoctrine()->getEntityManager();
         $username     = $request->request->get('username');
