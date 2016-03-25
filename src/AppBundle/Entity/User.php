@@ -21,6 +21,7 @@ class User implements UserInterface
     const TWO_FACTOR_METHOD_EMAIL = 'email';
 
     const DISPLAY_NAME_USERNAME = 'username';
+    const DISPLAY_NAME_FULL_NAME = 'full_name';
     const DISPLAY_NAME_FIRST_NAME_LAST_INITIAL = 'first_name_last_initial';
     const DISPLAY_NAME_FIRST_INITIAL_LAST_NAME = 'first_initial_last_name';
 
@@ -172,6 +173,42 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity="Device", mappedBy="user", cascade={"persist"})
      */
     protected $devices;
+
+    public static function getDisplayNameOptions()
+    {
+        return [
+            self::DISPLAY_NAME_USERNAME,
+            self::DISPLAY_NAME_FULL_NAME,
+            self::DISPLAY_NAME_FIRST_INITIAL_LAST_NAME,
+            self::DISPLAY_NAME_FIRST_NAME_LAST_INITIAL
+        ];
+    }
+
+    public function getDisplayName()
+    {
+        $displayName = $this->getFullName();
+
+        switch($this->displayNameOption)
+        {
+            case self::DISPLAY_NAME_USERNAME:
+                $displayName = $this->username;
+            break;
+
+            case self::DISPLAY_NAME_FIRST_INITIAL_LAST_NAME:
+                $displayName = substr($this->firstName, 0, 1) . ' ' . $this->lastName;
+            break;
+
+            case self::DISPLAY_NAME_FIRST_NAME_LAST_INITIAL:
+                $displayName = $this->firstName . ' ' . substr($this->lastName, 0, 1);
+            break;
+
+            case self::DISPLAY_NAME_FULL_NAME:
+            default:
+                $displayName = $this->getFullName();
+        }
+
+        return $displayName;
+    }
 
     public function getFullName()
     {

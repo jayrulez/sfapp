@@ -12,7 +12,7 @@ use AppBundle\Common\ErrorCode;
 use AppBundle\Entity\Client;
 
 /**
- * @Route("/api/clients")
+ * @Route("/clients")
  */
 class ClientController extends Controller
 {

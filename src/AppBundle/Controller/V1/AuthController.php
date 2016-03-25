@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace AppBundle\Controller\V1;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -16,7 +16,7 @@ use AppBundle\Common\Result;
 use AppBundle\Common\ErrorCode;
 
 /**
- * @Route("/api/public")
+ * @Route("/public")
  */
 class AuthController extends Controller
 {
@@ -196,7 +196,7 @@ class AuthController extends Controller
             
                 return new ApiResponse($result);
             }else{
-                $result->setError('Invalid credentials provided.', ErrorCode::INVALID_CREDENTIALS);
+                $result->setError('Invalid credentials provided.', ErrorCode::INVALID_PARAMETER);
 
                 return new ApiResponse($result);
             }

@@ -36,12 +36,12 @@ class VerificationCodeHelper
 			$verificationCode->setType($type)
 				->setSubject($subject)
 				->setCode(VerificationCode::generateCode($type))
-				->setCreatedAt($now)
-				->setUpdatedAt($now);
+				->setCreatedAt($now);
 
 			$this->em->persist($verificationCode);
 			$this->em->flush();
 		}else if($verificationCode->isExpired())
+		{
 			$verificationCode->setCode(VerificationCode::generateCode($type))
 				->setExpiresAt($now->add(new \DateInterval('P1D')))
 				->setUpdatedAt($now);

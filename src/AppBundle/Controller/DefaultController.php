@@ -12,12 +12,15 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/", name="default")
-     * @Route("/api/public/version", name="api_version")
+     * @Route("/public/version", name="api_version")
      */
     public function apiVersionAction(Request $request)
     {
         $result     = new Result();
-        $apiVersion = [];
+        $apiVersion = [
+            'default_version'    => '1',
+            'supported_versions' => ['1', '2']
+        ];
 
         $result->setData($apiVersion);
 

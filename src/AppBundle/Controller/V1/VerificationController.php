@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace AppBundle\Controller\V1;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -12,7 +12,7 @@ use AppBundle\Common\Result;
 use AppBundle\Common\ErrorCode;
 
 /**
- * @Route("/api/public")
+ * @Route("/public")
  */
 class VerificationController extends Controller
 {
@@ -35,7 +35,7 @@ class VerificationController extends Controller
 
     		if($emailAddress == null || $emailAddress->getVerified())
     		{
-    			$result->setError('This email address cannot be verified', ErrorCode::INVALID_EMAIL_ADDRESS);
+    			$result->setError('This email address cannot be verified', ErrorCode::INVALID_PARAMETER);
     			
 	            return new ApiResponse($result);
     		}
@@ -44,7 +44,7 @@ class VerificationController extends Controller
 
     		if($verificationCode == null || $verificationCode->isExpired() || $code != $verificationCode->getCode())
     		{
-                $result->setError('This verification code is invalid', ErrorCode::INVALID_VERIFICATION_CODE);
+                $result->setError('This verification code is invalid', ErrorCode::INVALID_PARAMETER);
                 
                 return new ApiResponse($result);
     		}
@@ -90,7 +90,7 @@ class VerificationController extends Controller
 
             if($mobileNumber == null || $mobileNumber->getVerified())
             {
-                $result->setError('This mobile number cannot be verified', ErrorCode::INVALID_MOBILE_NUMBER);
+                $result->setError('This mobile number cannot be verified', ErrorCode::INVALID_PARAMETER);
                 
                 return new ApiResponse($result);
             }
@@ -99,7 +99,7 @@ class VerificationController extends Controller
 
             if($verificationCode == null || $verificationCode->isExpired() || $code != $verificationCode->getCode())
             {
-                $result->setError('This verification code is invalid', ErrorCode::INVALID_VERIFICATION_CODE);
+                $result->setError('This verification code is invalid', ErrorCode::INVALID_PARAMETER);
                 
                 return new ApiResponse($result);
             }
