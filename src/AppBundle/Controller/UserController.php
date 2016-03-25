@@ -13,7 +13,7 @@ use AppBundle\Entity\User;
 use AppBundle\Event\UsernameChangeEvent;
 
 /**
- * @Route("/api/resource/users")
+ * @Route("/api/users")
  */
 class UserController extends Controller
 {
@@ -25,7 +25,7 @@ class UserController extends Controller
 	{
         $result = new Result();
 
-        $user = $this->get('user_helper')->getUser();
+        $user = $this->getUser();
 
         $result->setData($user, ['password', 'salt']);
 
@@ -97,8 +97,6 @@ class UserController extends Controller
 
         try
         {
-
-	    	$oldUsername = $user->getUsername();
 	        $user->setUsername($username)
 	        	->setUpdatedAt(new \DateTime('now'));
 
@@ -110,7 +108,7 @@ class UserController extends Controller
 
             try
             {
-                $event           = new UsernameChangeEvent($user, $oldUsername);
+                $event           = new UsernameChangeEvent($user);
                 $eventDispatcher = $this->get('event_dispatcher');
                 $eventDispatcher->dispatch(UsernameChangeEvent::USERNAME_CHANGE, $event);
             }catch(\Exception $e)

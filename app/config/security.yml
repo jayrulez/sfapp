@@ -4,7 +4,7 @@ security:
 
     providers:
         default:
-            entity:                 { class: AppBundle:User }
+            id: user_provider
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -12,29 +12,31 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        api_oauth2_authorize:
-            pattern:                ^/api/oauth2/authorize$
-            http_basic:             ~
-            provider:               default
+        oauth_token:
+            pattern:    ^/oauth/v2/token
+            security:   false
 
-        api_oauth2_token:
-            pattern:                ^/api/oauth2/token$
-            oauth2_token:           ~
+        oauth_authorize:
+            pattern:    ^/oauth/v2/auth
+            fos_oauth:  true
+            stateless:  true
+            anonymous:  true
 
-        api_oauth2_debug:
-            pattern:                ^/api/oauth2/debug$
-            oauth2_resource:        ~
+        admin_api:
+            pattern: ^/admin/api
+            security:   false
 
-        api_public:
-            pattern:                ^/api/public
-            oauth2_token:           ~
+        app_api_public:
+            pattern: ^/api/public
+            security:   false
 
-        api_resource:
-            pattern:                ^/api/resource
-            oauth2_resource:       
-                resource_type:      model
+        app_api:
+            pattern:    ^/api
+            fos_oauth:  true
+            stateless:  true
+            anonymous:  false # can be omitted as its default value
 
-        api_resource_model:
-            pattern:                ^/api/resource/model$
-            oauth2_resource:
-                resource_type:      model
+    access_control:
+        - { path: ^/api/public, roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
+        - { path: ^/api,        roles: [ IS_AUTHENTICATED_FULLY ] }
+        - { path: ^/admin/api,  roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }

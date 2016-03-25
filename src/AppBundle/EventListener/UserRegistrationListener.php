@@ -85,7 +85,7 @@ class UserRegistrationListener
 							//send mobile verification code
 							$smsService = $this->container->get('sms_service');
 
-							$verificationCode = $verificationCodeHelper->findOrCreate(VerificationCode::TYPE_MOBILE_NUMBER, $mobileNumber->getFullMobileNumber());
+							$verificationCode = $verificationCodeHelper->findOrCreate(VerificationCode::TYPE_MOBILE_NUMBER, $mobileNumber->getMobileNumber());
 
 							$message = 'Mobile verification code: ' . $verificationCode->getCode();
 

@@ -1,6 +1,20 @@
 parameters: ~
 
 services:
+    user_manager:
+        class: Doctrine\ORM\EntityManager
+        factory: ["@doctrine", getManagerForClass]
+        arguments: ["AppBundle:User"]
+
+    user_repository:
+        class: AppBundle\Repository\UserRepository
+        factory: ["@user_manager", getRepository]
+        arguments: ["AppBundle:User"]
+
+    user_provider:
+        class: AppBundle\User\UserProvider
+        arguments: ["@user_repository"]
+        
     email_service:
         class: AppBundle\Service\EmailService
         arguments:

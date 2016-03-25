@@ -8,8 +8,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Device.
  *
- * @ORM\Table(name="device")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\DeviceRepository")
+ * @ORM\Table(name="devices")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\DeviceRepository")
  */
 class Device
 {

@@ -5,6 +5,8 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
+use AppBundle\Common\ApiResponse;
+use AppBundle\Common\Result;
 
 class DefaultController extends Controller
 {
@@ -14,6 +16,11 @@ class DefaultController extends Controller
      */
     public function apiVersionAction(Request $request)
     {
-        return new JsonResponse([]);
+        $result     = new Result();
+        $apiVersion = [];
+
+        $result->setData($apiVersion);
+
+        return new ApiResponse($result);
     }
 }

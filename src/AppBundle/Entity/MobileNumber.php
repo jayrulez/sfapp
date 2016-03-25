@@ -9,8 +9,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * MobileNumber.
  *
- * @ORM\Table(name="mobile_number")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\MobileNumberRepository")
+ * @ORM\Table(name="mobile_numbers")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\MobileNumberRepository")
  *
  * @UniqueEntity(fields={"countryCode", "number"}, errorPath="number", message="This mobile number is already in use.")
  */

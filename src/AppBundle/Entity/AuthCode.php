@@ -2,14 +2,14 @@
 
 namespace AppBundle\Entity;
 
-use FOS\OAuthServerBundle\Entity\AccessToken as BaseAccessToken;
+use FOS\OAuthServerBundle\Entity\AuthCode as BaseAuthCode;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="access_tokens")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\AccessTokenRepository")
+ * @ORM\Table(name="auth_codes")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\AuthCodeRepository")
  */
-class AccessToken extends BaseAccessToken
+class AuthCode extends BaseAuthCode
 {
     /**
      * @ORM\Id

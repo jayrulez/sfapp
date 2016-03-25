@@ -1,43 +1,26 @@
 <?php
 
-/**
- * This file is part of the authbucket/oauth2-symfony-bundle package.
- *
- * (c) Wong Hoi Sing Edison <hswong3i@pantarei-design.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace AppBundle\Entity;
 
-use AuthBucket\Bundle\OAuth2Bundle\Entity\Client as AbstractClient;
+use FOS\OAuthServerBundle\Entity\Client as BaseClient;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Client.
- *
- * @ORM\Table(name="authbucket_oauth2_client")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\ClientRepository")
+ * @ORM\Table(name="clients")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\ClientRepository")
  */
-class Client extends AbstractClient
+class Client extends BaseClient
 {
     /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
+     * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
 
-    /**
-     * Get id.
-     *
-     * @return int
-     */
-    public function getId()
+    public function __construct()
     {
-        return $this->id;
+        parent::__construct();
+        // your own logic
     }
 }

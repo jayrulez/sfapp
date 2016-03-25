@@ -42,7 +42,6 @@ class AuthController extends Controller
             ->setFirstName($firstName)
             ->setLastName($lastName)
     		->setPassword($password)
-    		->setRoles(['ROLE_USER'])
             ->setCreatedAt(new \DateTime('now'));
 
         if(($address = $request->request->get('email_address', null)) != null)
@@ -176,7 +175,7 @@ class AuthController extends Controller
                 'grant_type'    => $grantType,
             ];
 
-            $subRequest = Request::create('/api/oauth2/token', 'POST', $parameters);
+            $subRequest = Request::create('/oauth/v2/token', 'POST', $parameters);
             $httpKernel = $this->get('http_kernel');
             $response   = $httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
             $tokenData  = json_decode($response->getContent(), true);

@@ -9,8 +9,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * EmailAddress.
  *
- * @ORM\Table(name="email_address")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\EmailAddressRepository")
+ * @ORM\Table(name="email_addresses")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\EmailAddressRepository")
  *
  * @UniqueEntity(fields={"address"}, errorPath="address", message="This email address is already in use.")
  */

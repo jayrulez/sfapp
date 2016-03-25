@@ -1,43 +1,31 @@
 <?php
 
-/**
- * This file is part of the authbucket/oauth2-symfony-bundle package.
- *
- * (c) Wong Hoi Sing Edison <hswong3i@pantarei-design.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace AppBundle\Entity;
 
-use AuthBucket\Bundle\OAuth2Bundle\Entity\RefreshToken as AbstractRefreshToken;
+use FOS\OAuthServerBundle\Entity\RefreshToken as BaseRefreshToken;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * RefreshToken.
- *
- * @ORM\Table(name="authbucket_oauth2_refresh_token")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\RefreshTokenRepository")
+ * @ORM\Table(name="refresh_tokens")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\RefreshTokenRepository")
  */
-class RefreshToken extends AbstractRefreshToken
+class RefreshToken extends BaseRefreshToken
 {
     /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
+     * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @ORM\ManyToOne(targetEntity="Client")
+     * @ORM\JoinColumn(nullable=false)
      */
-    public function getId()
-    {
-        return $this->id;
-    }
+    protected $client;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     */
+    protected $user;
 }

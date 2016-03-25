@@ -1,31 +1,21 @@
 <?php
 
-/**
- * This file is part of the authbucket/oauth2-symfony-bundle package.
- *
- * (c) Wong Hoi Sing Edison <hswong3i@pantarei-design.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace AppBundle\Entity;
 
-use AuthBucket\OAuth2\Model\ModelInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * User.
  *
- * @ORM\Table(name="authbucket_oauth2_user")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\UserRepository")
+ * @ORM\Table(name="users")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  *
  * @UniqueEntity(fields={"username"}, errorPath="username", message="This username is already in use.")
  */
-class User implements ModelInterface, UserInterface
+class User implements UserInterface
 {
     const TWO_FACTOR_METHOD_SMS = 'sms';
     const TWO_FACTOR_METHOD_EMAIL = 'email';
@@ -74,13 +64,6 @@ class User implements ModelInterface, UserInterface
      * )
      */
     protected $password;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="roles", type="array")
-     */
-    protected $roles;
 
     /**
      * @var string
@@ -254,27 +237,13 @@ class User implements ModelInterface, UserInterface
     }
 
     /**
-     * Set roles.
-     *
-     * @param array $roles
-     *
-     * @return User
-     */
-    public function setRoles($roles)
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    /**
      * Get roles.
      *
      * @return array
      */
     public function getRoles()
     {
-        return $this->roles;
+        return ['ROLE_USER'];
     }
 
     public function getSalt()

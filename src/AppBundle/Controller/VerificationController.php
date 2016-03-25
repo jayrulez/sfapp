@@ -56,7 +56,7 @@ class VerificationController extends Controller
     		$em->remove($verificationCode);
     		$em->flush();
 
-            $result->setData($emailAddress);
+            $result->setData($emailAddress, ['user']);
 
     		return new ApiResponse($result);
     	}catch(\Exception $e)
@@ -111,7 +111,7 @@ class VerificationController extends Controller
             $em->remove($verificationCode);
             $em->flush();
 
-            $result->setData($mobileNumber);
+            $result->setData($mobileNumber, ['user']);
 
             return new ApiResponse($result);
         }catch(\Exception $e)

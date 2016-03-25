@@ -1,11 +1,13 @@
-installer:
-    resource: "@InstallerBundle/Controller/"
+admin:
+    resource: "@AdminBundle/Controller/"
     type:     annotation
-    prefix:   /
+    prefix:   /admin
 
-authbucketoauth2bundle:
-    prefix:     /api/oauth2
-    resource:   "@AuthBucketOAuth2Bundle/Resources/config/routing.yml"
+fos_oauth_server_token:
+    resource: "@FOSOAuthServerBundle/Resources/config/routing/token.xml"
+
+fos_oauth_server_authorize:
+    resource: "@FOSOAuthServerBundle/Resources/config/routing/authorize.xml"
 
 app:
     resource: "@AppBundle/Controller/"

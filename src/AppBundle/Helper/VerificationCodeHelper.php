@@ -35,19 +35,20 @@ class VerificationCodeHelper
 
 			$verificationCode->setType($type)
 				->setSubject($subject)
-				->setCreatedAt($now);
-		}else{
-			$verificationCode->setUpdatedAt($now);
+				->setCode(VerificationCode::generateCode($type))
+				->setCreatedAt($now)
+				->setUpdatedAt($now);
+
+			$this->em->persist($verificationCode);
+			$this->em->flush();
+		}else if($verificationCode->isExpired())
+			$verificationCode->setCode(VerificationCode::generateCode($type))
+				->setExpiresAt($now->add(new \DateInterval('P1D')))
+				->setUpdatedAt($now);
+
+			$this->em->persist($verificationCode);
+			$this->em->flush();
 		}
-
-		$verificationCode->setCode(VerificationCode::generateCode($type))
-			->setExpiresAt($now->add(new \DateInterval('P1D')));
-
-		$this->em->persist($verificationCode);
-
-		$this->em->flush();
-
-		$this->em->refresh($verificationCode);
 
 		return $verificationCode;
 	}

@@ -62,12 +62,12 @@ class UserHelper
 
 	public function getUser()
 	{
-		return $this->findByUsername($this->tokenStorage->getToken()->getUser());
+		return $this->tokenStorage->getToken()->getUser();
 	}
 
 	public function createUser()
 	{
-		return $this->em->getRepository('AppBundle:User')->createUser();
+		return new User();
 	}
 
 	public function generateUsername($firstName, $lastName)

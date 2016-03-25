@@ -8,8 +8,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * VerificationCode.
  *
- * @ORM\Table(name="verification_code")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\VerificationCodeRepository")
+ * @ORM\Table(name="verification_codes")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\VerificationCodeRepository")
  */
 class VerificationCode
 {
@@ -36,7 +36,7 @@ class VerificationCode
 
     public function isExpired()
     {
-        return $this->expiresAt > new \DateTime('now');
+        return $this->expiresAt < new \DateTime('now');
     }
 
     /**
