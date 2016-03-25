@@ -22,3 +22,7 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
+    # String latest api version
+    api_version:       ~
+    # Collection of strings supported api versions
+    api_supported_versions: ~

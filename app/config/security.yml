@@ -27,23 +27,16 @@ security:
             security:   false
 
         app_api_public:
-            pattern:    ^/v(1|2)/public
+            pattern:    ^/v(\d+)/public
             security:   false
 
         app_api:
-            pattern:    ^/
-            fos_oauth:  true
-            stateless:  true
-            anonymous:  true
-
-        app_api_versioned:
-            pattern:    ^/v(1|2)
+            pattern:    ^/v(\d+)
             fos_oauth:  true
             stateless:  true
             anonymous:  false # can be omitted as its default value
 
     access_control:
-        - { path: ^/v(1|2)/public, roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
-        - { path: ^/v(1|2),        roles: [ IS_AUTHENTICATED_FULLY ] }
-        - { path: ^/,              roles: [ IS_AUTHENTICATED_ANONYMOUSLY, IS_AUTHENTICATED_FULLY ] }
-        - { path: ^/admin,         roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
+        - { path: ^/v(\d+)/public, roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
+        - { path: ^/v(\d+),        roles: [ IS_AUTHENTICATED_FULLY ] }
+        - { path: ^/admin,        roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }

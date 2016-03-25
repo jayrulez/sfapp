@@ -49,6 +49,13 @@ services:
         arguments:
             - "@doctrine.orm.entity_manager"
 
+    app.api_version_listener:
+        class: AppBundle\EventListener\ApiVersionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onCoreRequest, priority: -1 }
+        arguments:
+            - "@service_container"
+
     app.user_registration_listener:
         class: AppBundle\EventListener\UserRegistrationListener
         tags:

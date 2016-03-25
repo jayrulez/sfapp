@@ -11,18 +11,16 @@ use AppBundle\Common\Result;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/", name="default")
      * @Route("/public/version", name="api_version")
      */
     public function apiVersionAction(Request $request)
     {
         $result     = new Result();
-        $apiVersion = [
-            'default_version'    => '1',
-            'supported_versions' => ['1', '2']
-        ];
 
-        $result->setData($apiVersion);
+        $result->setData([
+            'version'    => $this->getParameter('api_version'),
+            'supported_versions' => $this->getParameter('api_supported_versions')
+        ]);
 
         return new ApiResponse($result);
     }

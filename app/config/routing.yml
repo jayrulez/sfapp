@@ -12,17 +12,4 @@ fos_oauth_server_authorize:
 app_api:
     resource: "@AppBundle/Controller"
     type:     annotation
-
-app_api_v1:
-    resource: "@AppBundle/Controller/V1"
-    type:     annotation
-    prefix: /v{version}
-    requirements:
-      version: '^1$'
-
-app_api_v2:
-    resource: "@AppBundle/Controller/V2"
-    type:     annotation
-    prefix: /v{version}
-    requirements:
-      version: '^2$'
+    prefix: /v{_version}

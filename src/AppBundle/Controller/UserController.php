@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Controller\V2;
+namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -18,7 +18,7 @@ use AppBundle\Event\UsernameChangeEvent;
 class UserController extends Controller
 {
     /**
-     * @Route("/me", name="v2_me")
+     * @Route("/me", name="me")
      * @Method({"GET"})
      */
 	public function meAction()
@@ -33,7 +33,7 @@ class UserController extends Controller
 	}
 
     /**
-     * @Route("/{identity}", name="v2_user")
+     * @Route("/{identity}", name="user")
      * @Method({"GET"})
      */
 	public function userAction($identity)
@@ -65,7 +65,7 @@ class UserController extends Controller
 	}
 
     /**
-     * @Route("/set_username", name="v2_set_username")
+     * @Route("/set_username", name="set_username")
      * @Method({"POST"})
      */
 	public function setUsernameAction(Request $request)
@@ -128,7 +128,7 @@ class UserController extends Controller
 	}
 
     /**
-     * @Route("/set_first_name", name="v2_set_first_name")
+     * @Route("/set_first_name", name="set_first_name")
      * @Method({"POST"})
      */
     public function setFirstNameAction(Request $request)
@@ -172,7 +172,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/set_last_name", name="v2_set_last_name")
+     * @Route("/set_last_name", name="set_last_name")
      * @Method({"POST"})
      */
     public function setLastNameAction(Request $request)
@@ -216,7 +216,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/set_display_name", name="v2_set_display_name")
+     * @Route("/set_display_name", name="set_display_name")
      * @Method({"POST"})
      */
     public function setDisplayNameAction(Request $request)
