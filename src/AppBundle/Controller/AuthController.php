@@ -253,10 +253,6 @@ class AuthController extends Controller
         $result       = new Result();
         $em           = $this->getDoctrine()->getEntityManager();
         $username     = $request->request->get('username');
-        $password     = $request->request->get('password');
-        $clientId     = $request->request->get('client_id');
-        $clientSecret = $request->request->get('client_secret');
-        $grantType    = $request->request->get('grant_type');
 
         try
         {
@@ -270,26 +266,18 @@ class AuthController extends Controller
 
                 if($emailAddress != null)
                 {
-                    $username = $emailAddress->getUser()->getUsername();
+                    $request->request->set('username', $emailAddress->getUser()->getUsername());
                 }
             }else{
                 $mobileNumber = $mobileNumberhelper->findByNumber($username);
 
                 if($mobileNumber != null)
                 {
-                    $username = $mobileNumber->getUser()->getUsername();
+                    $request->request->set('username', $mobileNumber->getUser()->getUsername());
                 }
             }
 
-            $parameters = [
-                'username'      => $username,
-                'password'      => $password,
-                'client_id'     => $clientId,
-                'client_secret' => $clientSecret,
-                'grant_type'    => $grantType,
-            ];
-
-            $subRequest = Request::create('/oauth/v2/token', 'POST', $parameters);
+            $subRequest = Request::create('/oauth/v2/token', 'POST', $request->request->all());
             $httpKernel = $this->get('http_kernel');
             $response   = $httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
             $tokenData  = json_decode($response->getContent(), true);
