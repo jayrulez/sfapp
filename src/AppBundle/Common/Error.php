@@ -46,4 +46,14 @@ class Error
 	{
 		return $this->_code;
 	}
+
+	public function getError()
+	{
+		return $this->_code;
+	}
+
+	public function getErrorDescription()
+	{
+		return $this->_message;
+	}
 }
