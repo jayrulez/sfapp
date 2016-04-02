@@ -79,4 +79,4 @@ fos_oauth_server:
     service:
         user_provider: user_provider
         options:
-            access_token_lifetime: 18000
+            access_token_lifetime: 300
