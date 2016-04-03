@@ -36,4 +36,9 @@ class MobileNumberHelper
 			'number' => $number
 		]);
 	}
+
+	public function serialize($mobileNumber)
+	{
+		return $mobileNumber;
+	}
 }

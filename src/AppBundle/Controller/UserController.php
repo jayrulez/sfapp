@@ -27,7 +27,7 @@ class UserController extends Controller
 
         $user = $this->getUser();
 
-        $result->setData($user, ['password', 'salt']);
+        $result->setData($userHelper->serialize($user));
 
         return new ApiResponse($result);
 	}
@@ -51,7 +51,7 @@ class UserController extends Controller
 	        	return new ApiResponse($result, ApiResponse::HTTP_NOT_FOUND);
 	        }
 
-	        $result->setData($user, ['password', 'salt']);
+	        $result->setData($userHelper->serialize($user));
 
 	        return new ApiResponse($result);
 	    }catch(\Exception $e)
@@ -104,7 +104,7 @@ class UserController extends Controller
 
 	        $em->flush();
 
-	        $result->setData($user, ['password', 'salt']);
+	        $result->setData($userHelper->serialize($user));
 
             try
             {
@@ -158,7 +158,7 @@ class UserController extends Controller
 
             $em->flush();
 
-            $result->setData($user, ['password', 'salt']);
+            $result->setData($userHelper->serialize($user));
 
             return new ApiResponse($result);
         }catch(\Exception $e)
@@ -202,7 +202,7 @@ class UserController extends Controller
 
             $em->flush();
 
-            $result->setData($user, ['password', 'salt']);
+            $result->setData($userHelper->serialize($user));
 
             return new ApiResponse($result);
         }catch(\Exception $e)
@@ -243,7 +243,7 @@ class UserController extends Controller
 
             $em->flush();
 
-            $result->setData($user, ['password', 'salt']);
+            $result->setData($userHelper->serialize($user));
 
             return new ApiResponse($result);
         }catch(\Exception $e)

@@ -22,10 +22,11 @@ class VerificationController extends Controller
      */
     public function verifyEmailAddressAction(Request $request)
     {
-        $result  = new Result();
-    	$em      = $this->getDoctrine()->getManager();
-    	$code    = $request->request->get('code');
-    	$address = trim(strtolower($request->request->get('email_address')));
+        $result             = new Result();
+        $emailAddressHelper = $this->get('email_address_helper');
+    	$em                 = $this->getDoctrine()->getManager();
+    	$code               = $request->request->get('code');
+    	$address            = $emailAddressHelper->normalizeAddress($request->request->get('email_address'));
 
     	$verificationCodeHelper = $this->get('verification_code_helper');
 
@@ -56,7 +57,7 @@ class VerificationController extends Controller
     		$em->remove($verificationCode);
     		$em->flush();
 
-            $result->setData($emailAddress, ['user']);
+            $result->setData($emailAddressHelper->serialize($emailAddress));
 
     		return new ApiResponse($result);
     	}catch(\Exception $e)
@@ -75,10 +76,11 @@ class VerificationController extends Controller
      */
     public function verifyMobileNumberAction(Request $request)
     {
-        $result  = new Result();
-        $em      = $this->getDoctrine()->getManager();
-        $code    = $request->request->get('code');
-        $number  = trim(strtolower($request->request->get('mobile_number')));
+        $result             = new Result();
+        $mobileNumberhelper = $this->get('mobile_number_helper');
+        $em                 = $this->getDoctrine()->getManager();
+        $code               = $request->request->get('code');
+        $number             = $mobileNumberhelper->normalizeNumber($request->request->get('mobile_number'));
 
         $verificationCodeHelper = $this->get('verification_code_helper');
 
@@ -111,7 +113,7 @@ class VerificationController extends Controller
             $em->remove($verificationCode);
             $em->flush();
 
-            $result->setData($mobileNumber, ['user']);
+            $result->setData($mobileNumberhelper->serialize($mobileNumber));
 
             return new ApiResponse($result);
         }catch(\Exception $e)

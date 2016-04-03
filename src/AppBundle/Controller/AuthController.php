@@ -117,7 +117,7 @@ class AuthController extends Controller
                 $this->get('logger')->error($e->getMessage());
             }
 
-            $result->setData($user, ["password"]);
+            $result->setData($userHelper->serialize($user));
 
             return new ApiResponse($result);
         }catch(\Exception $e)
@@ -229,7 +229,7 @@ class AuthController extends Controller
                 $this->get('logger')->error($e->getMessage());
             }
 
-            $result->setData($user, ["password"]);
+            $result->setData($userHelper->serialize($user));
 
             return new ApiResponse($result);
         }catch(\Exception $e)

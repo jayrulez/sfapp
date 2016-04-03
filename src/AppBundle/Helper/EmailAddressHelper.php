@@ -29,4 +29,9 @@ class EmailAddressHelper
 
 		return $this->em->getRepository('AppBundle:EmailAddress')->find($address);
 	}
+
+	public function serialize($emailAddress)
+	{
+		return $emailAddress;
+	}
 }

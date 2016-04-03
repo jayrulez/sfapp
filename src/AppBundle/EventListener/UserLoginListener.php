@@ -22,7 +22,6 @@ class UserLoginListener
 		{
 			$token   = $event->getToken();
 			$request = $event->getRequest();
-
 		}catch(\Exception $e)
 		{
 			$logger->error($e->getMessage());

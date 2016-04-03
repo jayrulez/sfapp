@@ -89,4 +89,17 @@ class UserHelper
 	{
 		return trim(ucwords(strtolower($lastName)));
 	}
+
+	public function serialize($user)
+	{
+		if($user == null)
+		{
+			return [];
+		}
+
+		return [
+			'id' => $user->getId(),
+			'username' => $user->getUsername()
+		];
+	}
 }
