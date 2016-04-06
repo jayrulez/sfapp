@@ -25,7 +25,9 @@ class UserController extends Controller
 	{
         $result = new Result();
 
-        $user = $this->getUser();
+        $userHelper = $this->get('user_helper');
+
+        $user = $userHelper->getUser();
 
         $result->setData($userHelper->serialize($user));
 
@@ -42,7 +44,8 @@ class UserController extends Controller
 
         try
         {
-	        $user = $this->get('user_helper')->findByIdOrUsername($identity);
+            $userHelper = $this->get('user_helper');
+	        $user       = $userHelper->findByIdOrUsername($identity);
 
 	        if($user == null)
 	        {
