@@ -32,7 +32,7 @@ class VerificationController extends Controller
 
     	try
     	{
-    		$emailAddress = $em->getRepository('AppBundle:EmailAddress')->find($address);
+    		$emailAddress = $emailAddressHelper->findByAddress($address);
 
     		if($emailAddress == null || $emailAddress->getVerified())
     		{
@@ -86,9 +86,7 @@ class VerificationController extends Controller
 
         try
         {
-            $mobileNumber = $em->getRepository('AppBundle:MobileNumber')->findOneBy([
-                'number' => $number
-            ]);
+            $mobileNumber = $mobileNumberhelper->findByNumber($number);
 
             if($mobileNumber == null || $mobileNumber->getVerified())
             {

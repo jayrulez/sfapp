@@ -20,21 +20,22 @@ class MobileNumberHelper
 
 	public function normalizeNumber($number)
 	{
-		return trim($number);
+		return preg_replace(['/\s+/', '/\+/'], '', $number);
 	}
 
 	public function normalizeCountryCode($countryCode)
 	{
-		return trim($countryCode);
+		return preg_replace(['/\s+/', '/\+/', '/-/'], '', $countryCode);
 	}
 
 	public function findByNumber($number)
 	{
 		$number = $this->normalizeNumber($number);
 
-		return $this->em->getRepository('AppBundle:MobileNumber')->findOneBy([
-			'number' => $number
-		]);
+		return $this->em
+			->createQuery('SELECT m FROM AppBundle:MobileNumber m WHERE m.number=:number OR CONCAT(m.countryCode, m.number)=:number')
+			->setParameter(':number', $number)
+			->getOneOrNullResult();
 	}
 
 	public function serialize($mobileNumber)
