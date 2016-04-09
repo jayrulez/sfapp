@@ -282,13 +282,15 @@ class AuthController extends Controller
             $response   = $httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
             $tokenData  = json_decode($response->getContent(), true);
 
+            $eventDispatcher = $this->get('event_dispatcher');
+
             if(isset($tokenData['access_token']))
             {
+
                 try
                 {
                     $event           = new UserLoginEvent($tokenData, $request);
-                    $eventDispatcher = $this->get('event_dispatcher');
-                    $eventDispatcher->dispatch(UserLoginEvent::USER_LOGIN, $event);
+                    $eventDispatcher->dispatch(UserLoginEvent::LOGIN_SUCCESS, $event);
                 }catch(\Exception $e)
                 {
                     $this->get('logger')->error($e->getMessage());
@@ -299,6 +301,10 @@ class AuthController extends Controller
                 return new ApiResponse($result);
             }else{
                 $result->setError(isset($tokenData['error_description']) ? $tokenData['error_description'] : 'Invalid credentials provided.', ErrorCode::INVALID_PARAMETER);
+
+
+                $event           = new UserLoginEvent(null, $request);
+                $eventDispatcher->dispatch(UserLoginEvent::LOGIN_FAILURE, $event);
 
                 return new ApiResponse($result, ApiResponse::HTTP_BAD_REQUEST);
             }

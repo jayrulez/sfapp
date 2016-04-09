@@ -62,6 +62,13 @@ services:
         arguments:
             - "@service_container"
 
+    app.two_factor_auth_listener:
+        class: AppBundle\EventListener\TwoFactorAuthListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onCoreRequest, priority: -1 }
+        arguments:
+            - "@service_container"
+
     app.user_registration_listener:
         class: AppBundle\EventListener\UserRegistrationListener
         tags:
@@ -69,10 +76,17 @@ services:
         arguments:
             - "@service_container"
 
-    app.user_login_listener:
+    app.login_success_listener:
         class: AppBundle\EventListener\UserLoginListener
         tags:
-            - { name: kernel.event_listener, event: app.user_login, method: onComplete, priority: -1 }
+            - { name: kernel.event_listener, event: app.login_success, method: onSuccess, priority: -1 }
+        arguments:
+            - "@service_container"
+
+    app.login_failure_listener:
+        class: AppBundle\EventListener\UserLoginListener
+        tags:
+            - { name: kernel.event_listener, event: app.login_failure, method: onFailure, priority: -1 }
         arguments:
             - "@service_container"
 
