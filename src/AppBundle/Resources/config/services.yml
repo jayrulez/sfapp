@@ -38,6 +38,12 @@ services:
             - "@security.token_storage"
             - "@mobile_number_helper"
             - "@email_address_helper"
+            - "@user_setting_helper"
+
+    user_setting_helper:
+        class: AppBundle\Helper\UserSettingHelper
+        arguments:
+            - "@doctrine.orm.entity_manager"
 
     mobile_number_helper:
         class: AppBundle\Helper\MobileNumberHelper

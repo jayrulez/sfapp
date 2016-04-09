@@ -217,45 +217,4 @@ class UserController extends Controller
             return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
-    /**
-     * @Route("/set_display_name", name="set_display_name")
-     * @Method({"POST"})
-     */
-    public function setDisplayNameAction(Request $request)
-    {
-        $result     = new Result();
-        $em         = $this->getDoctrine()->getManager();
-        $userHelper = $this->get('user_helper');
-        $user       = $userHelper->getUser();
-        $option     = $request->request->get('display_name_option', null);
-
-        if(!in_array($option, User::getDisplayNameOptions()))
-        {
-            $result->setError('Invalid display name option specified.', ErrorCode::VALIDATION_ERROR);
-                
-            return new ApiResponse($result);
-        }
-
-        try
-        {
-            $user->setDisplayNameOption($option)
-                ->setUpdatedAt(new \DateTime('now'));
-
-            $em->persist($user);
-
-            $em->flush();
-
-            $result->setData($userHelper->serialize($user));
-
-            return new ApiResponse($result);
-        }catch(\Exception $e)
-        {
-            $this->get('logger')->error($e->getMessage());
-
-            $result->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
-
-            return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
 }

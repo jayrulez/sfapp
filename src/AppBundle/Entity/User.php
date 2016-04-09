@@ -17,17 +17,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class User implements UserInterface
 {
-    const TWO_FACTOR_METHOD_SMS = 'sms';
-    const TWO_FACTOR_METHOD_EMAIL = 'email';
-
-    const DISPLAY_NAME_USERNAME = 'username';
-    const DISPLAY_NAME_FULL_NAME = 'full_name';
-    const DISPLAY_NAME_FIRST_NAME_LAST_INITIAL = 'first_name_last_initial';
-    const DISPLAY_NAME_FIRST_INITIAL_LAST_NAME = 'first_initial_last_name';
-
-    const GENDER_MALE = 'male';
+    const GENDER_MALE   = 'male';
     const GENDER_FEMALE = 'female';
-    const GENDER_OTHER = 'other';
+    const GENDER_OTHER  = 'other';
 
     /**
      * @var int
@@ -116,34 +108,6 @@ class User implements UserInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="primary_mobile_number", type="string", length=24, nullable=true)
-     */
-    protected $primaryMobileNumber;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="primary_email_address", type="string", length=50, nullable=true)
-     */
-    protected $primaryEmailAddress;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="two_factor_method", type="string", length=32, nullable=true)
-     */
-    protected $twoFactorMethod;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="display_name_option", type="string", length=32, nullable=true)
-     */
-    protected $displayNameOption;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
@@ -154,6 +118,11 @@ class User implements UserInterface
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     protected $updatedAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity="UserSetting", mappedBy="user", cascade={"persist"})
+     */
+    protected $userSettings;
 
     /**
      * @ORM\OneToMany(targetEntity="MobileNumber", mappedBy="user", cascade={"persist"})
@@ -173,42 +142,6 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity="Device", mappedBy="user", cascade={"persist"})
      */
     protected $devices;
-
-    public static function getDisplayNameOptions()
-    {
-        return [
-            self::DISPLAY_NAME_USERNAME,
-            self::DISPLAY_NAME_FULL_NAME,
-            self::DISPLAY_NAME_FIRST_INITIAL_LAST_NAME,
-            self::DISPLAY_NAME_FIRST_NAME_LAST_INITIAL
-        ];
-    }
-
-    public function getDisplayName()
-    {
-        $displayName = $this->getFullName();
-
-        switch($this->displayNameOption)
-        {
-            case self::DISPLAY_NAME_USERNAME:
-                $displayName = $this->username;
-            break;
-
-            case self::DISPLAY_NAME_FIRST_INITIAL_LAST_NAME:
-                $displayName = substr($this->firstName, 0, 1) . ' ' . $this->lastName;
-            break;
-
-            case self::DISPLAY_NAME_FIRST_NAME_LAST_INITIAL:
-                $displayName = $this->firstName . ' ' . substr($this->lastName, 0, 1);
-            break;
-
-            case self::DISPLAY_NAME_FULL_NAME:
-            default:
-                $displayName = $this->getFullName();
-        }
-
-        return $displayName;
-    }
 
     public function getFullName()
     {
@@ -289,16 +222,6 @@ class User implements UserInterface
 
     public function eraseCredentials()
     {
-    }
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->mobileNumbers = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->emailAddresses = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->devices = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -419,102 +342,6 @@ class User implements UserInterface
     public function getAvatar()
     {
         return $this->avatar;
-    }
-
-    /**
-     * Set primaryMobileNumber
-     *
-     * @param string $primaryMobileNumber
-     *
-     * @return User
-     */
-    public function setPrimaryMobileNumber($primaryMobileNumber)
-    {
-        $this->primaryMobileNumber = $primaryMobileNumber;
-
-        return $this;
-    }
-
-    /**
-     * Get primaryMobileNumber
-     *
-     * @return string
-     */
-    public function getPrimaryMobileNumber()
-    {
-        return $this->primaryMobileNumber;
-    }
-
-    /**
-     * Set primaryEmailAddress
-     *
-     * @param string $primaryEmailAddress
-     *
-     * @return User
-     */
-    public function setPrimaryEmailAddress($primaryEmailAddress)
-    {
-        $this->primaryEmailAddress = $primaryEmailAddress;
-
-        return $this;
-    }
-
-    /**
-     * Get primaryEmailAddress
-     *
-     * @return string
-     */
-    public function getPrimaryEmailAddress()
-    {
-        return $this->primaryEmailAddress;
-    }
-
-    /**
-     * Set twoFactorMethod
-     *
-     * @param string $twoFactorMethod
-     *
-     * @return User
-     */
-    public function setTwoFactorMethod($twoFactorMethod)
-    {
-        $this->twoFactorMethod = $twoFactorMethod;
-
-        return $this;
-    }
-
-    /**
-     * Get twoFactorMethod
-     *
-     * @return string
-     */
-    public function getTwoFactorMethod()
-    {
-        return $this->twoFactorMethod;
-    }
-
-    /**
-     * Set displayNameOption
-     *
-     * @param string $displayNameOption
-     *
-     * @return User
-     */
-    public function setDisplayNameOption($displayNameOption)
-    {
-        $this->displayNameOption = $displayNameOption;
-
-        return $this;
-    }
-
-    /**
-     * Get displayNameOption
-     *
-     * @return string
-     */
-    public function getDisplayNameOption()
-    {
-        return $this->displayNameOption;
     }
 
     /**
@@ -665,5 +492,49 @@ class User implements UserInterface
     public function getDevices()
     {
         return $this->devices;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->userSettings = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->mobileNumbers = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->emailAddresses = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->devices = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add userSetting
+     *
+     * @param \AppBundle\Entity\UserSetting $userSetting
+     *
+     * @return User
+     */
+    public function addUserSetting(\AppBundle\Entity\UserSetting $userSetting)
+    {
+        $this->userSettings[] = $userSetting;
+
+        return $this;
+    }
+
+    /**
+     * Remove userSetting
+     *
+     * @param \AppBundle\Entity\UserSetting $userSetting
+     */
+    public function removeUserSetting(\AppBundle\Entity\UserSetting $userSetting)
+    {
+        $this->userSettings->removeElement($userSetting);
+    }
+
+    /**
+     * Get userSettings
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUserSettings()
+    {
+        return $this->userSettings;
     }
 }
