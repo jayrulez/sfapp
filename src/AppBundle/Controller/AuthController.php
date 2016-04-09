@@ -46,7 +46,20 @@ class AuthController extends Controller
     		->setPassword($password)
             ->setCreatedAt(new \DateTime('now'));
 
-        if(($address = $request->request->get('email_address', null)) != null)
+        $mobileNumber = null;
+        $emailAddress = null;
+        $address      = $request->request->get('email_address', null);
+        $countryCode  = $request->request->get('country_code', null);
+        $number       = $request->request->get('mobile_number', null);
+
+        if($address == null && ($countryCode == null || $number == null))
+        {
+            $result->setError('Mobile number or email address is required.', ErrorCode::VALIDATION_ERROR);
+                
+            return new ApiResponse($result);
+        }
+
+        if($address != null)
         {
             $emailAddressHelper = $this->get('email_address_helper');
 
@@ -60,7 +73,9 @@ class AuthController extends Controller
             $emailAddress->setUser($user);
 
             $user->getEmailAddresses()->add($emailAddress);
-        }else if(($countryCode = $request->request->get('country_code', null)) != null && ($number = $request->request->get('mobile_number', null)) != null)
+        }
+
+        if($countryCode != null && $number != null)
         {
             $mobileNumberhelper = $this->get('mobile_number_helper');
 
@@ -76,10 +91,6 @@ class AuthController extends Controller
             $mobileNumber->setUser($user);
 
             $user->getMobileNumbers()->add($mobileNumber);
-        }else{
-            $result->setError('Mobile number or email address is required.', ErrorCode::VALIDATION_ERROR);
-                
-            return new ApiResponse($result);
         }
 
     	$errors = $this->get('validator')->validate($user);
@@ -105,9 +116,19 @@ class AuthController extends Controller
 
             $em->refresh($user);
 
+            if($emailAddress != null)
+            {
+                $em->refresh($emailAddress); 
+            }
+
+            if($mobileNumber != null)
+            {
+                $em->refresh($mobileNumber); 
+            }
+
             try
             {
-                $event           = new UserRegistrationEvent($user, $request);
+                $event           = new UserRegistrationEvent($user, $emailAddress, $mobileNumber, $request);
                 $eventDispatcher = $this->get('event_dispatcher');
                 $eventDispatcher->dispatch(UserRegistrationEvent::USER_REGISTRATION, $event);
             }catch(\Exception $e)

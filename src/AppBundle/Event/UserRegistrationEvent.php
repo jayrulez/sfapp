@@ -12,7 +12,11 @@ class UserRegistrationEvent extends Event
 
 	protected $request;
 
-	public function __construct($user, $request)
+	protected $emailAddress;
+
+	protected $mobileNumber;
+
+	public function __construct($user, $emailAddress, $mobileNumber, $request)
 	{
 		$this->user    = $user;
 		$this->request = $request;
@@ -26,5 +30,15 @@ class UserRegistrationEvent extends Event
 	public function getRequest()
 	{
 		return $this->request;
+	}
+
+	public function getEmailAddress()
+	{
+		return $this->emailAddress;
+	}
+
+	public function getMobileNumber()
+	{
+		return $this->mobileNumber;
 	}
 }

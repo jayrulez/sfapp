@@ -25,8 +25,10 @@ class UserRegistrationListener
 		{
 			$user    = $event->getUser();
 			$request = $event->getRequest();
+			$emailAddress = $event->getEmailAddress();
+			$mobileNumber = $event->getMobileNumber();
 
-			foreach($user->getEmailAddresses() as $emailAddress)
+			if($emailAddress != null)
 			{
 				$emailService = $this->container->get('email_service');
 				$twig         = $this->container->get('twig');
@@ -66,7 +68,7 @@ class UserRegistrationListener
 				}
 			}
 
-			foreach($user->getMobileNumbers() as $mobileNumber)
+			if($mobileNumber != null)
 			{
 				if(!$mobileNumber->getVerified())
 				{
