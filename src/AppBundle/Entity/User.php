@@ -101,13 +101,6 @@ class User implements UserInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="avatar", type="text", nullable=true)
-     */
-    protected $avatar;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
@@ -142,6 +135,11 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity="Device", mappedBy="user", cascade={"persist"})
      */
     protected $devices;
+
+    /**
+     * @ORM\OneToMany(targetEntity="LoginAttempt", mappedBy="user")
+     */
+    private $loginAttempts;
 
     public function getFullName()
     {
@@ -321,30 +319,6 @@ class User implements UserInterface
     }
 
     /**
-     * Set avatar
-     *
-     * @param string $avatar
-     *
-     * @return User
-     */
-    public function setAvatar($avatar)
-    {
-        $this->avatar = $avatar;
-
-        return $this;
-    }
-
-    /**
-     * Get avatar
-     *
-     * @return string
-     */
-    public function getAvatar()
-    {
-        return $this->avatar;
-    }
-
-    /**
      * Set createdAt
      *
      * @param \DateTime $createdAt
@@ -493,16 +467,6 @@ class User implements UserInterface
     {
         return $this->devices;
     }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->userSettings = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->mobileNumbers = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->emailAddresses = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->devices = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
     /**
      * Add userSetting
@@ -536,5 +500,50 @@ class User implements UserInterface
     public function getUserSettings()
     {
         return $this->userSettings;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->userSettings = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->mobileNumbers = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->emailAddresses = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->devices = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->loginAttempts = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add loginAttempt
+     *
+     * @param \AppBundle\Entity\LoginAttempt $loginAttempt
+     *
+     * @return User
+     */
+    public function addLoginAttempt(\AppBundle\Entity\LoginAttempt $loginAttempt)
+    {
+        $this->loginAttempts[] = $loginAttempt;
+
+        return $this;
+    }
+
+    /**
+     * Remove loginAttempt
+     *
+     * @param \AppBundle\Entity\LoginAttempt $loginAttempt
+     */
+    public function removeLoginAttempt(\AppBundle\Entity\LoginAttempt $loginAttempt)
+    {
+        $this->loginAttempts->removeElement($loginAttempt);
+    }
+
+    /**
+     * Get loginAttempts
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getLoginAttempts()
+    {
+        return $this->loginAttempts;
     }
 }

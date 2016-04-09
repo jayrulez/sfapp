@@ -6,7 +6,8 @@ use Symfony\Component\EventDispatcher\Event;
 
 class UserLoginEvent extends Event
 {
-	const USER_LOGIN = 'app.user_login';
+	const LOGIN_SUCCESS = 'app.login_success';
+	const LOGIN_FAILURE = 'app.login_failure';
 
 	protected $token;
 	protected $request;
