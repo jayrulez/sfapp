@@ -52,4 +52,40 @@ class UserSettingController extends Controller
             return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @Route("/set_two_factor_method", name="set_two_factor_method")
+     * @Method({"POST"})
+     */
+    public function setTwoFactorMethodAction(Request $request)
+    {
+        $result     = new Result();
+        $em         = $this->getDoctrine()->getManager();
+        $userHelper = $this->get('user_helper');
+        $user       = $userHelper->getUser();
+        $option     = $request->request->get('two_factor_method', null);
+
+        if(!in_array($option, UserSetting::getTwoFactorMethodOptions()))
+        {
+            $result->setError('Invalid two factor method specified.', ErrorCode::VALIDATION_ERROR);
+
+            return new ApiResponse($result);
+        }
+
+        try
+        {
+            $userHelper->setDisplayNameOption($user, $option);
+
+            $result->setData([]);
+
+            return new ApiResponse($result);
+        }catch(\Exception $e)
+        {
+            $this->get('logger')->error($e->getMessage());
+
+            $result->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
+
+            return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

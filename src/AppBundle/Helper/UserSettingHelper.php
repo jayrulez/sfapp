@@ -32,10 +32,10 @@ class UserSettingHelper
 		$this->em->flush();
 	}
 
-	public function get($user, $key)
+	public function get($user, $key, $default = null)
 	{
 		$userSetting = $this->em->getRepository('AppBundle:UserSetting')->findOne($user->getId(), $key);
 
-		return $userSetting != null ? $userSetting->getValue() : null;
+		return $userSetting != null ? $userSetting->getValue() : $default;
 	}
 }

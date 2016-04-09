@@ -21,11 +21,21 @@ class UserSetting
 
     const TWO_FACTOR_METHOD_SMS   = 'sms';
     const TWO_FACTOR_METHOD_EMAIL = 'email';
+    const TWO_FACTOR_METHOD_NONE  = 'none';
 
     const DISPLAY_NAME_USERNAME                = 'username';
     const DISPLAY_NAME_FULL_NAME               = 'full_name';
     const DISPLAY_NAME_FIRST_NAME_LAST_INITIAL = 'first_name_last_initial';
     const DISPLAY_NAME_FIRST_INITIAL_LAST_NAME = 'first_initial_last_name';
+
+    public static function getTwoFactorMethodOptions()
+    {
+        return [
+            self::TWO_FACTOR_METHOD_SMS,
+            self::TWO_FACTOR_METHOD_EMAIL,
+            self::TWO_FACTOR_METHOD_NONE
+        ];
+    }
 
     public static function getDisplayNameOptions()
     {

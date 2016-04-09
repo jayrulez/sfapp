@@ -128,6 +128,16 @@ class UserHelper
     	$this->userSettingHelper->set($user, UserSetting::KEY_DISPLAY_NAME_OPTION, $option);
     }
 
+    public function getTwoFactorMethod($user)
+    {
+    	$this->userSettingHelper->get($user, UserSetting::KEY_TWO_FACTOR_AUTH_METHOD);
+    }
+
+    public function setTwoFactorMethod($user, $option)
+    {
+    	$this->userSettingHelper->set($user, UserSetting::KEY_TWO_FACTOR_AUTH_METHOD, $option);
+    }
+
 	public function serialize($user)
 	{
 		if($user == null)
