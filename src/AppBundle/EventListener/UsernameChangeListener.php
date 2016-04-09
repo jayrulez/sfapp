@@ -20,7 +20,7 @@ class UsernameChangeListener
 
 		try
 		{
-			$user        = $event->getUser();
+			$user = $event->getUser();
 
 		}catch(\Exception $e)
 		{

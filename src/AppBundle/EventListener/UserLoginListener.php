@@ -38,7 +38,7 @@ class UserLoginListener
 
 					$loginAttempt = new LoginAttempt();
 
-					$loginAttempt->setUserId($user->getId)
+					$loginAttempt->setUserId($user->getId())
 						->setUser($user)
 						->setStatus(LoginAttempt::STATUS_SUCCESS)
 						->setIpAddress($this->container->get('request_stack')->getMasterRequest()->getClientIp())
@@ -77,7 +77,7 @@ class UserLoginListener
 
 					$loginAttempt = new LoginAttempt();
 
-					$loginAttempt->setUserId($user->getId)
+					$loginAttempt->setUserId($user->getId())
 						->setUser($user)
 						->setStatus(LoginAttempt::STATUS_FAILURE)
 						->setIpAddress($this->container->get('request_stack')->getMasterRequest()->getClientIp())

@@ -57,10 +57,9 @@ class AuthController extends Controller
                 ->setVerified(false)
                 ->setCreatedAt(new \DateTime('now'));
 
-            $user->setPrimaryEmailAddress($emailAddress->getAddress())
-                ->getEmailAddresses()->add($emailAddress);
+            $emailAddress->setUser($user);
 
-                $emailAddress->setUser($user);
+            $user->getEmailAddresses()->add($emailAddress);
         }else if(($countryCode = $request->request->get('country_code', null)) != null && ($number = $request->request->get('mobile_number', null)) != null)
         {
             $mobileNumberhelper = $this->get('mobile_number_helper');
@@ -74,10 +73,9 @@ class AuthController extends Controller
                 ->setVerified(false)
                 ->setCreatedAt(new \DateTime('now'));
 
-            $user->setPrimaryMobileNumber($mobileNumber->getFullMobileNumber())
-                ->getMobileNumbers()->add($mobileNumber);
-
             $mobileNumber->setUser($user);
+
+            $user->getMobileNumbers()->add($mobileNumber);
         }else{
             $result->setError('Mobile number or email address is required.', ErrorCode::VALIDATION_ERROR);
                 
@@ -133,125 +131,13 @@ class AuthController extends Controller
     }
 
     /**
-     * @Route("/register", name="v2_register", requirements={
-     *     "_version": "^2$"
-     * })
-     * @Method({"POST"})
-     */
-    public function registerV2Action(Request $request)
-    {
-        $result     = new Result();
-
-        $em         = $this->getDoctrine()->getManager();
-        $userHelper = $this->get('user_helper');
-
-        $firstName  = $userHelper->normalizeFirstName($request->request->get('first_name'));
-        $lastName   = $userHelper->normalizeLastName($request->request->get('last_name'));
-        $password   = $request->request->get('password');
-        $username   = $userHelper->generateUsername($firstName, $lastName);
-
-        $user       = $userHelper->createUser();
-
-        $user->setUsername($username)
-            ->setFirstName($firstName)
-            ->setLastName($lastName)
-            ->setPassword($password)
-            ->setCreatedAt(new \DateTime('now'));
-
-        if(($address = $request->request->get('email_address', null)) != null)
-        {
-            $emailAddressHelper = $this->get('email_address_helper');
-
-            $address = $emailAddressHelper->normalizeAddress($address);
-
-            $emailAddress = $emailAddressHelper->createEmailAddress();
-            $emailAddress->setAddress($address)
-                ->setVerified(false)
-                ->setCreatedAt(new \DateTime('now'));
-
-            $user->setPrimaryEmailAddress($emailAddress->getAddress())
-                ->getEmailAddresses()->add($emailAddress);
-
-                $emailAddress->setUser($user);
-        }else if(($countryCode = $request->request->get('country_code', null)) != null && ($number = $request->request->get('mobile_number', null)) != null)
-        {
-            $mobileNumberhelper = $this->get('mobile_number_helper');
-
-            $countryCode  = $mobileNumberhelper->normalizeCountryCode($countryCode);
-            $number       = $mobileNumberhelper->normalizeNumber($number);
-            $mobileNumber = $mobileNumberhelper->createMobileNumber();
-
-            $mobileNumber->setCountryCode($countryCode)
-                ->setNumber($number)
-                ->setVerified(false)
-                ->setCreatedAt(new \DateTime('now'));
-
-            $user->setPrimaryMobileNumber($mobileNumber->getFullMobileNumber())
-                ->getMobileNumbers()->add($mobileNumber);
-
-            $mobileNumber->setUser($user);
-        }else{
-            $result->setError('Mobile number or email address is required.', ErrorCode::VALIDATION_ERROR);
-                
-            return new ApiResponse($result);
-        }
-
-        $errors = $this->get('validator')->validate($user);
-
-        if(count($errors) > 0)
-        {
-            $result->setError($errors[0]->getMessage(), ErrorCode::VALIDATION_ERROR);
-                
-            return new ApiResponse($result);
-        }
-
-        $em->getConnection()->beginTransaction();
-
-        try
-        {
-            $user->setPassword($this->get('security.password_encoder')->encodePassword($user, $user->getPassword()));
-
-            $em->persist($user);
-
-            $em->flush();
-
-            $em->getConnection()->commit();
-
-            $em->refresh($user);
-
-            try
-            {
-                $event           = new UserRegistrationEvent($user, $request);
-                $eventDispatcher = $this->get('event_dispatcher');
-                $eventDispatcher->dispatch(UserRegistrationEvent::USER_REGISTRATION, $event);
-            }catch(\Exception $e)
-            {
-                $this->get('logger')->error($e->getMessage());
-            }
-
-            $result->setData($userHelper->serialize($user));
-
-            return new ApiResponse($result);
-        }catch(\Exception $e)
-        {
-            $em->getConnection()->rollBack();
-
-            $this->get('logger')->error($e->getMessage());
-
-            $result->setError($e->getMessage(), ErrorCode::INTERVAL_SERVER_ERROR);
-
-            return new ApiResponse($result, ApiResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
      * @Route("/login", name="login")
      * @Method({"POST"})
      */
     public function loginAction(Request $request)
     {
         $result       = new Result();
-        $em           = $this->getDoctrine()->getEntityManager();
+        $em           = $this->getDoctrine()->getManager();
         $username     = $request->request->get('username');
 
         try
