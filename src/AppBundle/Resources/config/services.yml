@@ -45,6 +45,11 @@ services:
         arguments:
             - "@doctrine.orm.entity_manager"
 
+    system_setting_helper:
+        class: AppBundle\Helper\SystemSettingHelper
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
     mobile_number_helper:
         class: AppBundle\Helper\MobileNumberHelper
         arguments:
