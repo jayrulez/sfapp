@@ -13,9 +13,9 @@ use AppBundle\Entity\User;
 use AppBundle\Entity\UserSetting;
 
 /**
- * @Route("/user_settings")
+ * @Route("/settings")
  */
-class UserSettingController extends Controller
+class SettingController extends Controller
 {
     /**
      * @Route("/set_display_name", name="set_display_name")
